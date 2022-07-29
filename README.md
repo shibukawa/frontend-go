@@ -1,5 +1,7 @@
 # frontend-go
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/shibukawa/frontend-go.svg)](https://pkg.go.dev/github.com/shibukawa/frontend-go)
+
  SPA (Single Page Application) style web application frontend helper for go server. This package works with Next.js, Vue.js, SvelteKit, Solid.js.
 
 ## Development Mode
