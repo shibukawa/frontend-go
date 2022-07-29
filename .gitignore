@@ -102,3 +102,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+# execution
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
