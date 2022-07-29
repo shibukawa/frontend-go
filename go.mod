@@ -1,4 +1,4 @@
-module github.com/shibukawa/webfront-go
+module github.com/shibukawa/frontend-go
 
 go 1.18
 

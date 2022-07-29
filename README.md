@@ -64,7 +64,7 @@ package main
 func handler() http.Handler {
     mux := http.NewServeMux()
     mux.Handle("/api", YourAPIHandler)
-    mux.Handle("/", webfront.MustNewSPAHandler())
+    mux.Handle("/", frontend.MustNewSPAHandler())
     return mux
 }
 ```
@@ -80,7 +80,7 @@ import (
 func handler() http.Handler  {
     r := chi.NewRouter()
     r.Post("/api", YourAPIHandler)
-    r.NotFound(webfront.MustNewHandlerFunc())
+    r.NotFound(frontend.MustNewHandlerFunc())
     return r
 }
 ```
@@ -235,14 +235,14 @@ var asset embed.FS
 
 ## Configuration
 
-`webfront.NewSPAHandler()` has option that modifies package's behavior. 
+`frontend.NewSPAHandler()` has option that modifies package's behavior. 
 
 If you put frontend project at `frontend` folder and doesn't change npm scripts, you don't have to modify configuration.
 
 ```go
-handler := webfront.NewSPAHandler(ctx, webfront.Opt{
+handler := frontend.NewSPAHandler(ctx, frontend.Opt{
     FrontEndFolder: "frontend",              // Frontend application folder that contains package.json. default value is "frontend"
-    ProjectType:    webfront.AutoDetect,     // NextJS, SvelteKit, VueJS, SolidJS is available
+    ProjectType:    frontend.AutoDetect,     // NextJS, SvelteKit, VueJS, SolidJS is available
     SkipRunningDevServer:     false,         // Skip running dev server even if development mode
     DistFolder:     "",                      // Specify dist folder instead of auto detect
     Port:           0,                       // Specify port instead of auto detect
