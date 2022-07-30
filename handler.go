@@ -60,7 +60,7 @@ func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
 	var handler http.Handler
 	switch mode {
 	case Release:
-		root := path.Join(o.FrontEndFolder, o.DistFolder)
+		root := path.Join(o.FrontEndFolderPath, o.DistFolder)
 		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			err := tryRead(root, r.URL.Path, w)
 			if err == nil {
@@ -79,7 +79,7 @@ func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
 			}
 		})
 	case Development:
-		_, host, err := startDevServer(ctx, o.FrontEndFolder, o.DevServerCommand)
+		_, host, err := startDevServer(ctx, o.FrontEndFolderPath, o.DevServerCommand)
 		if err != nil {
 			return nil, err
 		}
