@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"path"
 	"path/filepath"
+	"strconv"
 )
 
 var ErrDir = errors.New("path is dir")
@@ -79,15 +80,26 @@ func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
 			}
 		})
 	case Development:
-		_, host, err := startDevServer(ctx, o.FrontEndFolderPath, o.DevServerCommand)
-		if err != nil {
-			return nil, err
+		if !o.SkipRunningDevServer {
+			_, host, err := startDevServer(ctx, o.FrontEndFolderPath, o.DevServerCommand)
+			if err != nil {
+				return nil, err
+			}
+			u, err := url.Parse(host)
+			if err != nil {
+				log.Fatal(err)
+			}
+			handler = httputil.NewSingleHostReverseProxy(u)
+		} else if o.Port != 0 {
+			// todo: test
+			u, _ := url.Parse("http://localhost:" + strconv.Itoa(int(o.Port)))
+			handler = httputil.NewSingleHostReverseProxy(u)
+		} else {
+			// todo: test
+			handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// do nothing
+			})
 		}
-		u, err := url.Parse(host)
-		if err != nil {
-			log.Fatal(err)
-		}
-		handler = httputil.NewSingleHostReverseProxy(u)
 	}
 
 	return handler, nil
