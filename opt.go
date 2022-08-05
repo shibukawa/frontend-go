@@ -42,11 +42,27 @@ func (p packageJson) Has(f string) bool {
 	return ok
 }
 
-func normalizeOpt(currentFolder string, opts []Opt) (*Opt, error) {
-	var opt Opt
-	if len(opts) > 0 {
-		opt = opts[0]
+func normalizeRelOpt(opt Opt) *Opt {
+	if opt.FrontEndFolderPath == "" {
+		opt.FrontEndFolderPath = "frontend"
 	}
+	if opt.FrontEndFolderName == "" {
+		_, opt.FrontEndFolderName = filepath.Split(opt.FrontEndFolderPath)
+	}
+	if defaultConfig, ok := frameworkConfigs[opt.FrameworkType]; ok {
+		if opt.DistFolder == "" {
+			opt.DistFolder = defaultConfig.DistFolder
+		}
+		if opt.DevServerCommand == "" {
+			opt.DevServerCommand = defaultConfig.DevServerCommand
+		}
+	} else {
+		panic("invalid framework type is specified: " + opt.FrameworkType.String())
+	}
+	return &opt
+}
+
+func normalizeDevOpt(currentFolder string, opt Opt) (*Opt, error) {
 	if opt.FrontEndFolderName == "" && opt.FrontEndFolderPath == "" {
 		opt.FrontEndFolderName = "frontend"
 	}

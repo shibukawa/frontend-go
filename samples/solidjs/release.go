@@ -14,5 +14,7 @@ import (
 var asset embed.FS
 
 func init() {
-	frontend.SetFrontAsset(asset)
+	frontend.SetFrontAsset(asset, frontend.Opt{
+		FrameworkType: frontend.SolidJS,
+	})
 }

@@ -11,7 +11,7 @@ import (
 
 func Test_normalizeOpt(t *testing.T) {
 	type args struct {
-		opts []Opt
+		opt Opt
 	}
 	testDataPaths := acquire.MustAcquire(acquire.Dir, "testdata")
 	tests := []struct {
@@ -25,7 +25,7 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "empty opt autofill",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject"),
 			args: args{
-				opts: []Opt{},
+				opt: Opt{},
 			},
 			wantErr: nil,
 			want: &Opt{
@@ -40,16 +40,14 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "filled opt",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject"),
 			args: args{
-				opts: []Opt{
-					{
-						FrameworkType:        SvelteKit,
-						DistFolder:           ".dist",
-						FrontEndFolderName:   "web",
-						Port:                 3000,
-						SkipRunningDevServer: true,
-						DevServerCommand:     "yarn dev",
-						FallbackPath:         "200.html",
-					},
+				opt: Opt{
+					FrameworkType:        SvelteKit,
+					DistFolder:           ".dist",
+					FrontEndFolderName:   "web",
+					Port:                 3000,
+					SkipRunningDevServer: true,
+					DevServerCommand:     "yarn dev",
+					FallbackPath:         "200.html",
 				},
 			},
 			wantErr: nil,
@@ -68,7 +66,7 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "detect ancestor folder",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject/subfolder"),
 			args: args{
-				opts: []Opt{},
+				opt: Opt{},
 			},
 			wantErr: nil,
 			want: &Opt{
@@ -83,10 +81,8 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "frontend abs path is specified",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject"),
 			args: args{
-				opts: []Opt{
-					{
-						FrontEndFolderPath: filepath.Join(testDataPaths[0], "emptyproject", "frontend"),
-					},
+				opt: Opt{
+					FrontEndFolderPath: filepath.Join(testDataPaths[0], "emptyproject", "frontend"),
 				},
 			},
 			wantErr: nil,
@@ -102,10 +98,8 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "error: frontend abs path is specified (invalid)",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject"),
 			args: args{
-				opts: []Opt{
-					{
-						FrontEndFolderPath: filepath.Join(testDataPaths[0], "emptyproject", "not-exists"),
-					},
+				opt: Opt{
+					FrontEndFolderPath: filepath.Join(testDataPaths[0], "emptyproject", "not-exists"),
 				},
 			},
 			wantErr: ErrPackageJsonNotFound,
@@ -114,10 +108,8 @@ func Test_normalizeOpt(t *testing.T) {
 			name:          "error: frontend folder name is specified (invalid)",
 			currentFolder: filepath.Join(testDataPaths[0], "emptyproject"),
 			args: args{
-				opts: []Opt{
-					{
-						FrontEndFolderName: "not-exists",
-					},
+				opt: Opt{
+					FrontEndFolderName: "not-exists",
 				},
 			},
 			wantErr: ErrPackageJsonNotFound,
@@ -125,7 +117,7 @@ func Test_normalizeOpt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := normalizeOpt(tt.currentFolder, tt.args.opts)
+			got, err := normalizeDevOpt(tt.currentFolder, tt.args.opt)
 			if tt.wantErr != nil {
 				assert.True(t, errors.Is(err, tt.wantErr))
 			} else {
@@ -197,7 +189,7 @@ func Test_normalizeOpt_Detect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := normalizeOpt(tt.projectFolder, nil)
+			got, err := normalizeDevOpt(tt.projectFolder, Opt{})
 			if tt.wantErr != nil {
 				assert.True(t, errors.Is(err, tt.wantErr))
 			} else {

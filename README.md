@@ -52,7 +52,9 @@ package webapp
 var asset embed.FS
 
 init() {
-    frontend.SetFrontAsset(asset)
+    frontend.SetFrontAsset(asset, frontend.Opt{
+      FrameworkType: frontend.NextJS, // select: NextJS, VueJS, SvelteKit, SolidJS
+    })
 }
 ```
 
@@ -235,12 +237,19 @@ var asset embed.FS
 
 ## Configuration
 
-`frontend.NewSPAHandler()` has option that modifies package's behavior. 
+`frontend.SetFrontAsset()` (for production), `frontend.SetOption()` (other usage) accept option that modifies package's behavior. 
 
 If you put frontend project at `frontend` folder and doesn't change npm scripts, you don't have to modify configuration.
 
 ```go
-handler := frontend.NewSPAHandler(ctx, frontend.Opt{
+//go:build release
+
+:
+
+//go:embed frontend/build/*
+var asset embed.FS
+
+handler := frontend.SetFrontAsset(assets, frontend.Opt{
     FrontEndFolder: "frontend",              // Frontend application folder that contains package.json. default value is "frontend"
     ProjectType:    frontend.AutoDetect,     // NextJS, SvelteKit, VueJS, SolidJS is available
     SkipRunningDevServer:     false,         // Skip running dev server even if development mode
@@ -249,6 +258,22 @@ handler := frontend.NewSPAHandler(ctx, frontend.Opt{
     DevelopmentCommand: "npm run dev",       // Specify dev server command instead of auto detect
     FallbackPath:       string               // Specify fallback file path. Default is "index.html"
 })
+```
+
+For development mode, this package tries to configure package as much as possible, including framework type.
+
+If you want to set option for development mode, add the following file and set option:
+
+```go:development.go
+//go:build !release
+
+package webapp
+
+init() {
+    frontend.SetOption(frontend.Opt{
+        SkipRunningDevServer: true,
+    })
+}
 ```
 
 ## Credits

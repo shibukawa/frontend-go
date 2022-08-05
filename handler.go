@@ -20,10 +20,17 @@ var ErrDir = errors.New("path is dir")
 var mode Mode = Development
 
 var frontAssets embed.FS
+var opt Opt
 
-func SetFrontAsset(assets embed.FS) {
+func SetFrontAsset(assets embed.FS, o Opt) {
 	frontAssets = assets
 	mode = Release
+	opt = o
+}
+
+func SetOption(o Opt) {
+	mode = Release
+	opt = o
 }
 
 func tryRead(prefix, requestedPath string, w http.ResponseWriter) error {
@@ -50,18 +57,15 @@ func tryRead(prefix, requestedPath string, w http.ResponseWriter) error {
 //
 // Use with net/http:
 //
-//   h, err := NewSPAHandler(ctx)
-//   http.Handle("/", h)
-//
-func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
-	o, err := normalizeOpt(".", opt)
-	if err != nil {
-		return nil, err
-	}
+//	h, err := NewSPAHandler(ctx)
+//	http.Handle("/", h)
+func NewSPAHandler(ctx context.Context) (http.Handler, error) {
 	var handler http.Handler
 	switch mode {
 	case Release:
+		o := normalizeRelOpt(opt)
 		root := path.Join(o.FrontEndFolderPath, o.DistFolder)
+		log.Println(path.Join(o.FrontEndFolderPath, o.DistFolder), o.FrontEndFolderPath, o.DistFolder)
 		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			err := tryRead(root, r.URL.Path, w)
 			if err == nil {
@@ -74,12 +78,17 @@ func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
 					return
 				}
 			}
+			log.Println(root, "index.html")
 			err = tryRead(root, "index.html", w)
 			if err != nil {
 				panic(err)
 			}
 		})
 	case Development:
+		o, err := normalizeDevOpt(".", opt)
+		if err != nil {
+			return nil, err
+		}
 		if !o.SkipRunningDevServer {
 			_, host, err := startDevServer(ctx, o.FrontEndFolderPath, o.DevServerCommand)
 			if err != nil {
@@ -109,12 +118,11 @@ func NewSPAHandler(ctx context.Context, opt ...Opt) (http.Handler, error) {
 //
 // Use with chi:
 //
-//   r := chi.NewRouter()
-//   c, err := NewSPAHandlerFunc(ctx)
-//   http.NotFound(h)
-//
-func NewSPAHandlerFunc(ctx context.Context, opt ...Opt) (http.HandlerFunc, error) {
-	h, err := NewSPAHandler(ctx, opt...)
+//	r := chi.NewRouter()
+//	c, err := NewSPAHandlerFunc(ctx)
+//	http.NotFound(h)
+func NewSPAHandlerFunc(ctx context.Context) (http.HandlerFunc, error) {
+	h, err := NewSPAHandler(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +132,8 @@ func NewSPAHandlerFunc(ctx context.Context, opt ...Opt) (http.HandlerFunc, error
 }
 
 // MustNewSPAHandler is similar to [NewSPAHandler] but this calls panic when error.
-func MustNewSPAHandler(ctx context.Context, opt ...Opt) http.Handler {
-	h, err := NewSPAHandler(ctx, opt...)
+func MustNewSPAHandler(ctx context.Context) http.Handler {
+	h, err := NewSPAHandler(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -133,8 +141,8 @@ func MustNewSPAHandler(ctx context.Context, opt ...Opt) http.Handler {
 }
 
 // MustNewSPAHandlerFunc is similar to [NewSPAHandlerFunc] but this calls panic when error.
-func MustNewSPAHandlerFunc(ctx context.Context, opt ...Opt) http.HandlerFunc {
-	h, err := NewSPAHandlerFunc(ctx, opt...)
+func MustNewSPAHandlerFunc(ctx context.Context) http.HandlerFunc {
+	h, err := NewSPAHandlerFunc(ctx)
 	if err != nil {
 		panic(err)
 	}
