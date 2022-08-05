@@ -65,7 +65,6 @@ func NewSPAHandler(ctx context.Context) (http.Handler, error) {
 	case Release:
 		o := normalizeRelOpt(opt)
 		root := path.Join(o.FrontEndFolderPath, o.DistFolder)
-		log.Println(path.Join(o.FrontEndFolderPath, o.DistFolder), o.FrontEndFolderPath, o.DistFolder)
 		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			err := tryRead(root, r.URL.Path, w)
 			if err == nil {
@@ -78,7 +77,6 @@ func NewSPAHandler(ctx context.Context) (http.Handler, error) {
 					return
 				}
 			}
-			log.Println(root, "index.html")
 			err = tryRead(root, "index.html", w)
 			if err != nil {
 				panic(err)
