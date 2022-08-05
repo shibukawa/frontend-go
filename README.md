@@ -53,7 +53,7 @@ var asset embed.FS
 
 init() {
     frontend.SetFrontAsset(asset, frontend.Opt{
-      FrameworkType: frontend.NextJS, // select: NextJS, VueJS, SvelteKit, SolidJS
+        FrameworkType: frontend.NextJS, // select: NextJS, VueJS, SvelteKit, SolidJS
     })
 }
 ```
@@ -138,6 +138,12 @@ The go:embed directive comment should be the following by default:
 //go:embed frontend/out/_next/static/*/*
 //go:embed frontend/out/_next/static/chunks/pages/*.js
 var asset embed.FS
+
+init() {
+    frontend.SetFrontAsset(asset, frontend.Opt{
+        FrameworkType: frontend.NextJS,
+    })
+}
 ```
 
 ### Vue.js
@@ -161,6 +167,12 @@ The go:embed directive comment should be the following by default:
 ```go:release.go
 //go:embed frontend/dist/*
 var asset embed.FS
+
+init() {
+    frontend.SetFrontAsset(asset, frontend.Opt{
+        FrameworkType: frontend.VueJS,
+    })
+}
 ```
 
 ### SvelteKit
@@ -211,6 +223,12 @@ The go:embed directive comment should be the following by default:
 ```go:release.go
 //go:embed frontend/build/*
 var asset embed.FS
+
+init() {
+    frontend.SetFrontAsset(asset, frontend.Opt{
+        FrameworkType: frontend.SvelteKit,
+    })
+}
 ```
 
 
@@ -233,6 +251,12 @@ The go:embed directive comment should be the following by default:
 ```go:release.go
 //go:embed frontend/dist/*
 var asset embed.FS
+
+init() {
+    frontend.SetFrontAsset(asset, frontend.Opt{
+        FrameworkType: frontend.SolidJS,
+    })
+}
 ```
 
 ## Configuration
