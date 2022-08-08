@@ -99,7 +99,7 @@ $ go build -tags release
 
 ### Next.js 12
 
-frontend-go assumes Next.js's static generation result (that does'n need Node.js/bun to run).
+frontend-go assumes Next.js's static generation result (that doesn't need Node.js/bun to run).
 
 To start project with Next.js, init project like this:
 
